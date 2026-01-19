@@ -28,6 +28,7 @@ public class MerchantController {
 
 	private final MerchantService merchantService;
 
+
 	@PostMapping("/products")
 	@PreAuthorize("hasRole('MERCHANT')")
 	@ResponseStatus(HttpStatus.CREATED)
