@@ -10,7 +10,12 @@ import java.util.Set;
 import org.springframework.stereotype.Service;
 
 import com.jsp.ecommerce.dao.ProductDao;
+import com.jsp.ecommerce.dao.UserDao;
+import com.jsp.ecommerce.entity.Cart;
+import com.jsp.ecommerce.entity.Customer;
+import com.jsp.ecommerce.entity.Item;
 import com.jsp.ecommerce.entity.Product;
+import com.jsp.ecommerce.exception.OutOfStockException;
 import com.jsp.ecommerce.mapper.ProductMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -20,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 public class CustomerServiceImpl implements CustomerService {
 	private final ProductDao productDao;
 	private final ProductMapper productMapper;
+	private final UserDao userDao;
 
 	@Override
 	public Map<String, Object> getProducts(int page, int size, String sort, boolean desc, String name, String category,
@@ -42,4 +48,55 @@ public class CustomerServiceImpl implements CustomerService {
 			throw new NoSuchElementException("No Products Found .");
 		return Map.of("message","Products Found","products",productMapper.toProductDtoList(products));
 	}
+
+	@Override
+	public Map<String, Object> addToCart(Long id, String email, String size) {
+		Product product = productDao.getProductById(id);
+		Customer customer = userDao.findCustomerByEmail(email);
+		if (product.getStock() <= 0)
+			throw new OutOfStockException(product.getName() + " is Out of Stock");
+		if (!product.getSize().contains(size))
+			throw new OutOfStockException(size + " is Out of Stock");
+		Cart cart = customer.getCart();
+		if (cart == null) {
+			cart = new Cart();
+			customer.setCart(cart);
+		}
+		List<Item> items = cart.getItems();
+		if (items == null) {
+			items = new ArrayList<Item>();
+			cart.setItems(items);
+		}
+
+		if (items.isEmpty()) {
+			Item item = new Item();
+			item.setProduct(product);
+			item.setQuantity(1);
+			item.setSize(size);
+			items.add(item);
+		} else {
+			boolean flag = true;
+			for (Item item : items) {
+				if (item.getProduct().getId() == product.getId()) {
+					item.setQuantity(item.getQuantity() + 1);
+					item.setSize(size);
+					flag = false;
+					break;
+				}
+			}
+			if (flag) {
+				Item item = new Item();
+				item.setProduct(product);
+				item.setQuantity(1);
+				item.setSize(size);
+				items.add(item);
+			}
+		}
+		product.setStock(product.getStock() - 1);
+		productDao.save(product);
+		userDao.save(customer);
+		return Map.of("message", product.getName() + " added to Cart Success", "product",
+				productMapper.toProductDto(product));
+	}
 }
+

@@ -1,10 +1,16 @@
 package com.jsp.ecommerce.controller;
 
+import java.security.Principal;
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jsp.ecommerce.service.CustomerService;
@@ -25,6 +31,13 @@ public class CustomerController {
 			@RequestParam(required = false) String category, @RequestParam(required = false) String lower,
 			@RequestParam(required = false) String higher) {
 		return customerService.getProducts(page,size,sort,desc,name,category,lower,higher);
+	}
+
+	@PostMapping ("/cart/product/{id}")
+	@PreAuthorize("hasRole('CUSTOMER')")
+	@ResponseStatus(HttpStatus.CREATED)
+	public Map<String, Object> addToCart(@PathVariable Long id, Principal principal, @RequestParam String size) {
+		return customerService.addToCart(id, principal.getName(), size);
 	}
 	
 }
