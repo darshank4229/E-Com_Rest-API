@@ -7,8 +7,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
+import com.jsp.ecommerce.entity.Item;
 import com.jsp.ecommerce.entity.Merchant;
 import com.jsp.ecommerce.entity.Product;
+import com.jsp.ecommerce.repository.ItemRepository;
 import com.jsp.ecommerce.repository.ProductRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -17,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ProductDao {
 	private final ProductRepository productRepository;
+	private final ItemRepository itemRepository;
 
 	public void save(Product product) {
 		productRepository.save(product);
@@ -97,6 +100,14 @@ public class ProductDao {
 			throw new NoSuchElementException(
 					"No Products Found within Price range : " + lowerRange + " and " + higherRange);
 		return products;
+	}
+
+	public void saveItem(Item item) {
+		itemRepository.save(item);
+	}
+
+	public void deleteItem(Item item) {
+		itemRepository.deleteById(item.getId());
 	}
 	
 	

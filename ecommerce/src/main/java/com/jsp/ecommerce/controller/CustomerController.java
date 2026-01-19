@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,5 +47,13 @@ public class CustomerController {
 	public Map<String, Object> viewCart(Principal principal) {
 		return customerService.viewCart(principal.getName());
 	}
+	
+	@DeleteMapping("/cart/product/{id}")
+	@PreAuthorize("hasRole('CUSTOMER')")
+	@ResponseStatus(HttpStatus.OK)
+	public Map<String, Object> removeFromCart(@PathVariable Long id, Principal principal) {
+		return customerService.removeFromCart(id, principal.getName());
+	}
+	
 	
 }

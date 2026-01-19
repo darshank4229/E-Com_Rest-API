@@ -11,4 +11,6 @@ public interface CustomerService {
 
 	Map<String, Object> viewCart(String email);
 
+	Map<String, Object> removeFromCart(Long id, String email);
+
 }

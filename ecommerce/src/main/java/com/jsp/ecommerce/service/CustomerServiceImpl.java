@@ -110,5 +110,40 @@ public class CustomerServiceImpl implements CustomerService {
 			throw new NoSuchElementException("No Items in Cart");
 		return Map.of("message", "Cart Found Success", "items", productMapper.toItemsDtoList(items));
 	}
+
+	@Override
+	public Map<String, Object> removeFromCart(Long id, String email) {
+		Customer customer = userDao.findCustomerByEmail(email);
+		Product product = productDao.getProductById(id);
+
+		Cart cart = customer.getCart();
+		if (cart == null)
+			throw new NoSuchElementException(product.getName() + " is Not in Cart");
+		List<Item> items = cart.getItems();
+		if (items.isEmpty())
+			throw new NoSuchElementException(product.getName() + " is Not in Cart");
+		boolean flag = false;
+
+		for (Item item : items) {
+			if (item.getProduct().getId() == id) {
+				if (item.getQuantity() > 1) {
+					item.setQuantity(item.getQuantity() - 1);
+					productDao.saveItem(item);
+				} else {
+					items.remove(item);
+					userDao.save(customer);
+					productDao.deleteItem(item);
+				}
+				flag = true;
+				break;
+			}
+		}
+		if (!flag)
+			throw new NoSuchElementException(product.getName() + " is Not in Cart");
+		product.setStock(product.getStock() + 1);
+		productDao.save(product);
+		return Map.of("message", "Product Removed From cart Success", "product", productMapper.toProductDto(product));
+	
+	}
 }
 
