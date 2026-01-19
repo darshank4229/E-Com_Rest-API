@@ -40,4 +40,11 @@ public class CustomerController {
 		return customerService.addToCart(id, principal.getName(), size);
 	}
 	
+	@GetMapping("/cart")
+	@PreAuthorize("hasRole('CUSTOMER')")
+	@ResponseStatus(HttpStatus.OK)
+	public Map<String, Object> viewCart(Principal principal) {
+		return customerService.viewCart(principal.getName());
+	}
+	
 }

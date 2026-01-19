@@ -9,4 +9,6 @@ public interface CustomerService {
 
 	Map<String, Object> addToCart(Long id, String email, String size);
 
+	Map<String, Object> viewCart(String email);
+
 }

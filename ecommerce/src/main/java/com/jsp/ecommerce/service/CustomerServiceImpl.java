@@ -98,5 +98,17 @@ public class CustomerServiceImpl implements CustomerService {
 		return Map.of("message", product.getName() + " added to Cart Success", "product",
 				productMapper.toProductDto(product));
 	}
+
+	@Override
+	public Map<String, Object> viewCart(String email) {
+		Customer customer = userDao.findCustomerByEmail(email);
+		Cart cart = customer.getCart();
+		if (cart == null)
+			throw new NoSuchElementException("No Items in Cart");
+		List<Item> items = cart.getItems();
+		if (items.isEmpty())
+			throw new NoSuchElementException("No Items in Cart");
+		return Map.of("message", "Cart Found Success", "items", productMapper.toItemsDtoList(items));
+	}
 }
 
