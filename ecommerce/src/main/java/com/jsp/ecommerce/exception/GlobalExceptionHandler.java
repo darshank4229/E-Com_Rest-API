@@ -90,4 +90,9 @@ public class GlobalExceptionHandler {
 		return Map.of("error", "Something Went Wrong");
 	}
 
+	@ExceptionHandler(OutOfStockException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public Map<String, Object> handle(OutOfStockException exception) {
+		return Map.of("error", exception.getMessage());
+	}
 }
