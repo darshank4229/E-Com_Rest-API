@@ -28,7 +28,6 @@ public class MerchantController {
 
 	private final MerchantService merchantService;
 
-
 	@PostMapping("/products")
 	@PreAuthorize("hasRole('MERCHANT')")
 	@ResponseStatus(HttpStatus.CREATED)
@@ -53,7 +52,8 @@ public class MerchantController {
 	@PutMapping("/products/{id}")
 	@PreAuthorize("hasRole('MERCHANT')")
 	@ResponseStatus(HttpStatus.OK)
-	public Map<String, Object> updateProduct(@PathVariable Long id,@RequestBody @Valid ProductDto productDto, Principal principal) {
-		return merchantService.updateProduct(id,productDto, principal.getName());
+	public Map<String, Object> updateProduct(@PathVariable Long id, @RequestBody @Valid ProductDto productDto,
+			Principal principal) {
+		return merchantService.updateProduct(id, productDto, principal.getName());
 	}
 }
